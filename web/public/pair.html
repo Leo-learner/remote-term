@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#11111b">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="/icons/favicon.png">
+<link rel="stylesheet" href="/public.css">
+<script type="module" src="/pair.js"></script>
+<title>配对新设备</title>
+</head>
+<body>
+<main class="panel">
+  <div class="mark"><img src="/mark.svg" alt="" width="40" height="40"></div>
+
+  <section id="step-start" class="panel">
+    <h1>配对新设备</h1>
+    <p>会为这台设备创建一个通行密钥，之后用面容 ID 登录。</p>
+    <label class="field">设备名称
+      <input id="device-name" type="text" maxlength="40" autocomplete="off">
+    </label>
+    <button id="create" type="button">创建通行密钥</button>
+  </section>
+
+  <section id="step-done" class="panel" hidden>
+    <h1>配对完成</h1>
+    <p>添加到主屏幕后可以全屏使用，也能收到通知：</p>
+    <ol class="steps">
+      <li>点 Safari 底部的「分享」按钮</li>
+      <li>选择「添加到主屏幕」</li>
+      <li>从主屏幕上的图标打开，再用面容 ID 登录一次</li>
+    </ol>
+    <a class="button secondary" href="/app/">先在浏览器里打开</a>
+  </section>
+
+  <p id="message" class="message" role="status"></p>
+</main>
+</body>
+</html>

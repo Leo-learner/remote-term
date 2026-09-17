@@ -1,0 +1,4 @@
+ZDOTDIR="$RT_USER_ZDOTDIR"
+[[ -f "$ZDOTDIR/.zprofile" ]] && source "$ZDOTDIR/.zprofile"
+RT_USER_ZDOTDIR="$ZDOTDIR"
+ZDOTDIR="$RT_ZDOTDIR"

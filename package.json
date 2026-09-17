@@ -1,0 +1,17 @@
+{
+  "name": "remote-term",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Use this Mac's shell from a phone: passkey login, end-to-end encrypted relay, persistent sessions.",
+  "type": "module",
+  "scripts": {
+    "setup": "npm --prefix agent install && npm --prefix relay install && npm --prefix web install && node scripts/vendor.js",
+    "vendor": "node scripts/vendor.js",
+    "test": "node --test test/*.test.js",
+    "dev": "node scripts/dev.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT"
+}

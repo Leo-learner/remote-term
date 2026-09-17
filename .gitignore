@@ -1,0 +1,11 @@
+node_modules/
+build/
+relay/data/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+web/app/vendor/
+.dev/
+.claude/

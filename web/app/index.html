@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN" data-keyboard="down">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#181825">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Harbor">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/favicon.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="vendor/xterm.css">
+<link rel="stylesheet" href="app.css">
+<script type="module" src="js/main.js"></script>
+<title>Harbor</title>
+</head>
+<body>
+<div id="app" class="app" data-state="connecting">
+  <header class="top-bar">
+    <button id="title-button" class="title-button" type="button">
+      <span id="title-text" class="title-text">连接中…</span>
+      <svg class="chevron" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <span id="conn" class="conn" data-state="connecting" aria-live="polite"><i class="dot"></i><span id="rtt" class="rtt"></span></span>
+    <button id="menu-button" class="icon-button" type="button" aria-label="菜单">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+    </button>
+  </header>
+
+  <main id="stage" class="stage">
+    <div id="term-host" class="term-host"></div>
+    <div id="banner" class="banner" hidden></div>
+    <button id="to-bottom" class="to-bottom" type="button" hidden>↓ 回到底部</button>
+    <div id="hud" class="hud" hidden></div>
+    <div id="empty" class="empty" hidden>
+      <p>还没有会话</p>
+      <button type="button" class="primary" data-action="new-session">新建会话</button>
+    </div>
+    <div id="exited" class="exited" hidden>
+      <span class="exited-text"></span>
+      <button type="button" data-action="restart">重新开始</button>
+      <button type="button" data-action="close-current">关闭</button>
+    </div>
+  </main>
+
+  <footer class="dock">
+    <form id="compose" class="compose" hidden>
+      <textarea id="compose-input" rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" placeholder="写好整行再发送"></textarea>
+      <button type="submit" class="send" aria-label="发送">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </form>
+    <div class="dock-row">
+      <button id="mode-button" class="mode" type="button" data-mode="direct" aria-label="切换输入方式">直接</button>
+      <div id="key-bar" class="key-bar" role="toolbar" aria-label="快捷键"></div>
+      <button id="keyboard-button" class="icon-button keyboard" type="button" aria-label="收起或弹出键盘">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 10h1M11 10h1M15 10h1M8 13.5h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </footer>
+</div>
+
+<div id="backdrop" class="backdrop"></div>
+
+<section id="switcher" class="sheet" hidden aria-label="会话">
+  <div class="sheet-head">
+    <h2>会话</h2>
+    <button type="button" class="pill" data-action="new-session">新建</button>
+  </div>
+  <ul id="session-list" class="session-list"></ul>
+</section>
+
+<section id="menu" class="sheet" hidden aria-label="菜单">
+  <div class="menu-list">
+    <button type="button" data-action="new-session">新建会话</button>
+    <button type="button" data-action="select-text">选择文本</button>
+    <button type="button" data-action="settings">设置</button>
+    <button type="button" data-action="lock">立即锁定</button>
+  </div>
+</section>
+
+<section id="settings" class="sheet tall" hidden aria-label="设置">
+  <div class="sheet-head">
+    <h2>设置</h2>
+    <button type="button" class="pill secondary" data-action="close-sheet">完成</button>
+  </div>
+  <div id="settings-body" class="settings-body"></div>
+</section>
+
+<section id="select-sheet" class="sheet tall" hidden aria-label="选择文本">
+  <div class="sheet-head">
+    <button type="button" class="pill secondary" data-action="copy-last">复制上一条输出</button>
+    <button type="button" class="pill secondary" data-action="copy-all">复制全部</button>
+    <button type="button" class="pill" data-action="close-sheet">完成</button>
+  </div>
+  <pre id="select-text" class="select-text"></pre>
+</section>
+
+<section id="lock" class="overlay" hidden>
+  <div class="overlay-card">
+    <h2>验证身份以继续</h2>
+    <p id="lock-message" class="overlay-note"></p>
+    <button id="unlock-button" type="button" class="primary">使用面容 ID</button>
+  </div>
+</section>
+
+<section id="offline" class="overlay soft" hidden>
+  <div class="overlay-card">
+    <h2>电脑离线</h2>
+    <p class="overlay-note">可能是电脑合盖睡眠了、菜单栏程序没有运行，或者网络断了。电脑恢复后这里会自动连上。</p>
+    <button type="button" class="secondary" data-action="retry">重试</button>
+  </div>
+</section>
+
+<div id="confirm" class="dialog" hidden role="alertdialog">
+  <div class="dialog-card">
+    <h2 class="dialog-title"></h2>
+    <p class="dialog-message"></p>
+    <div class="dialog-actions">
+      <button type="button" data-choice="cancel"></button>
+      <button type="button" data-choice="ok"></button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden role="status"></div>
+</body>
+</html>
