@@ -105,16 +105,21 @@ final class Agent {
         return handle
     }
 
-    // The agent writes one JSON object per line on stdout.
+    // The agent writes one JSON object per line on stdout. Two kinds stay out of the log file:
+    // replies to the status window's polling (every 3 s while it is open) and pairing events,
+    // whose link carries the one-time secret. Everything else is logged, stray stderr included.
+    private static let unlogged: Set<String> = ["reply", "pairing"]
+
     private func consume(_ data: Data) {
-        log?.write(data)
         pending.append(data)
         while let newline = pending.firstIndex(of: 0x0A) {
-            let line = pending.subdata(in: pending.startIndex..<newline)
+            let line: Data = pending.subdata(in: pending.startIndex..<(newline + 1))
+            let body: Data = pending.subdata(in: pending.startIndex..<newline)
             pending.removeSubrange(pending.startIndex...newline)
-            if let event = (try? JSONSerialization.jsonObject(with: line)) as? [String: Any] {
-                onEvent(event)
-            }
+            let event = (try? JSONSerialization.jsonObject(with: body)) as? [String: Any]
+            let kind: String = (event?["event"] as? String) ?? ""
+            if !Agent.unlogged.contains(kind) { log?.write(line) }
+            if let event { onEvent(event) }
         }
     }
 }
