@@ -4,9 +4,7 @@
 import { randomBytes } from 'node:crypto';
 import { JsonFile } from './store.js';
 
-const MINUTE = 60_000;
-const HOUR = 60 * MINUTE;
-const DAY = 24 * HOUR;
+export const IDLE_LIMIT_MS = 12 * 3_600_000;
 
 // Decides whether a stored ticket may still open the terminal without a new Face ID.
 //   ticket.createdAt   when the passkey ceremony minted it (ms)
@@ -14,9 +12,10 @@ const DAY = 24 * HOUR;
 //   now                current time (ms)
 // Return true to reconnect silently, false to show the lock screen and ask for Face ID.
 //
-// TODO(Leo): this placeholder keeps things working until you choose your own policy.
+// The owner's rule (2026-09-17): Face ID again after 12 hours without use. There is no absolute
+// lifetime, so a phone in daily use never has to ask. test/tickets.test.js pins this.
 export function ticketStillValid(ticket, now) {
-  return now - ticket.lastUsedAt < 12 * HOUR && now - ticket.createdAt < 7 * DAY;
+  return now - ticket.lastUsedAt < IDLE_LIMIT_MS;
 }
 
 export class TicketStore {

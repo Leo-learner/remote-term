@@ -16,7 +16,7 @@ relay 所在的 Azure 服务器上还跑着其他 Node 应用，都用同一个 
 
 - **设备令牌**（Mac ↔ relay）：`agent/setup.js` 生成，relay 只存它的 SHA-256。证明"这个 WebSocket 来自那台 Mac"。
 - **通行密钥**（主人 ↔ Mac）：私钥在 iPhone 的 iCloud 钥匙串里；公钥存在 Mac 的 `credentials.json`，同时同步一份给 relay 用来做外层登录。
-- **票据**（手机 ↔ Mac）：面容 ID 验证成功后由 Mac 签发，32 字节密钥。手机把它导入成**不可导出**的 WebCrypto HKDF 密钥存进 IndexedDB，Mac 存在 `tickets.json`。每次建立连接都要用它，是否仍然有效由 `agent/tickets.js` 的 `ticketStillValid()` 决定。
+- **票据**（手机 ↔ Mac）：面容 ID 验证成功后由 Mac 签发，32 字节密钥。手机把它导入成**不可导出**的 WebCrypto HKDF 密钥存进 IndexedDB，Mac 存在 `tickets.json`。每次建立连接都要用它，是否仍然有效由 `agent/tickets.js` 的 `ticketStillValid()` 决定。主人定的规则是：闲置 12 小时后要重新用面容 ID，没有绝对有效期；连接保持期间每 5 分钟复查一次并刷新最后使用时间。
 
 ## 配对（在 Mac 前面，一次）
 
